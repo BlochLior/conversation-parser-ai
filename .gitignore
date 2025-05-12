@@ -1,3 +1,4 @@
 plan.md
 .env
-python-ai/.venv
+python-ai/.venv/
+python-ai/__pycache__/
