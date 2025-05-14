@@ -1,0 +1,27 @@
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+
+# Ignore test files and coverage results
+tests/
+.coverage
+coverage.xml
+htmlcov/
+
+# Ignore local env files and IDE settings
+.env
+.env.*
+.vscode/
+.idea/
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# venv
+.venv/

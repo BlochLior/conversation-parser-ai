@@ -9,8 +9,9 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 from pathlib import Path
 
-load_dotenv(dotenv_path=Path(__file__).resolve().parents[2] / ".env")
-
+if os.getenv("ENV") != "production":
+    load_dotenv(dotenv_path=Path(__file__).resolve().parents[2] / ".env")
+    
 model_name = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 
 llm = ChatOpenAI(temperature=0.7, model=model_name)
