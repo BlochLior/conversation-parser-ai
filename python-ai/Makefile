@@ -14,7 +14,7 @@ build:
 
 # 🚀 Run the Docker container
 run-docker:
-	docker run -p 8001:8001 --env-file=.env python-ai-service
+	docker run -p 8001:8001 --env-file=.env -e ENV=production python-ai-service
 
 # 🧽 Clean __pycache__ and coverage
 clean:
