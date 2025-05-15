@@ -1,0 +1,6 @@
+# ignore the logs, runtime output
+logs/
+.venv/
+__pycache__/
+app/__pycache__/
+tests/__pycache__/

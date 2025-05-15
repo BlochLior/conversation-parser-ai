@@ -1,9 +1,4 @@
 plan.md
 .env
-python-ai/.venv/
-python-ai/__pycache__/
-python-ai/app/__pycache__/
-python-ai/tests/__pycache__/
 __pycache__/
 .vscode/
-python-ai/.env
