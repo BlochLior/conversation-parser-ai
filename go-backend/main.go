@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
+
+	"github.com/BlochLior/conversation-parser-ai/go-backend/utils"
 )
 
 func main() {
@@ -10,7 +12,7 @@ func main() {
 
 	mux.HandleFunc("/submit", handlers.AnalyzeHandler)
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		respondWithJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+		utils.RespondWithJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 	})
 
 	log.Println("🔧 Go server running at :8000")
