@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/BlochLior/conversation-parser-ai/go-backend/client"
 )
 
 func TestAnalyzeHandler_Success(t *testing.T) {
@@ -15,9 +17,7 @@ func TestAnalyzeHandler_Success(t *testing.T) {
 	}))
 	defer mockAI.Close()
 
-	oldURL := pythonAIURL
-	pythonAIURL = mockAI.URL
-	defer func() { pythonAIURL = oldURL }()
+	aiService = client.New(mockAI.URL)
 
 	payload := `{"conversation": "Speaker A: Hello\nSpeaker B: What?"}`
 	r := httptest.NewRequest("POST", "/submit", bytes.NewBuffer([]byte(payload)))
