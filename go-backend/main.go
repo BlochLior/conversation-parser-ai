@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/BlochLior/conversation-parser-ai/go-backend/handlers"
 	"github.com/BlochLior/conversation-parser-ai/go-backend/utils"
 )
 
