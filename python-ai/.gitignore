@@ -4,3 +4,4 @@ logs/
 __pycache__/
 app/__pycache__/
 tests/__pycache__/
+.ruff_cache/

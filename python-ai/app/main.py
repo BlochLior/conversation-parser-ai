@@ -22,6 +22,10 @@ app = FastAPI()
 llm = ChatOpenAI(temperature=0.7, model=model_name)
 chain = prompt | llm | StrOutputParser()
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
 @app.post("/analyze", response_model=AnalyzeResponse)
 async def analyze(req: AnalyzeRequest):
     logger.info(f"🔍 Received conversation:\n{req.conversation}")
