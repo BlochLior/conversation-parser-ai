@@ -1,29 +1,26 @@
-version: '3.8'
-
 services:
-  go-backend:
-    build:
-      context: ./go-backend
-    ports:
-      - "8000:8000"
-    depends_on:
-      - python-ai
-    environment:
-      - PORT=8000
-    env_file:
-      - ../.env
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
+  # 🧠 Python AI FastAPI service
   python-ai:
     build:
       context: ./python-ai
+    container_name: python-ai
+    env_file:
+      - ./python-ai/.env
     ports:
       - "8001:8001"
-    env_file:
-      - ../.env
     environment:
-      - PORT=8001
+      - ENV=production
+    restart: unless-stopped
+
+  # 🌐 Go backend API (uses net/http)
+  go-backend:
+    build:
+      context: ./go-backend
+    container_name: go-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - python-ai  # Ensure Python service starts first
+    environment:
+      - PYTHON_AI_URL=http://python-ai:8001
+    restart: unless-stopped

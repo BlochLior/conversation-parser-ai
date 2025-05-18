@@ -35,6 +35,9 @@ build-go:
 run-docker-go:
 	docker run -p 8000:8000 go-backend-service
 
+# 🔁 Build both services
+build-all: build-python build-go
+
 # 📄 View recent logs from the Python AI service container
 logs:
 	docker ps -q --filter ancestor=python-ai-service | xargs -r docker logs --tail=50
@@ -60,3 +63,18 @@ ci-go: lint-go gosec test-go
 # 🚦 Full CI target for both services
 ci-all: ci-python ci-go
 
+# 🧪 Run both Go and Python services via Compose
+dev:
+	docker-compose up --build
+
+# 🛑 Stop and clean up all Compose containers
+dev-down:
+	docker-compose down --remove-orphans --volumes
+
+# 🔁 Rebuild and restart services with Docker Compose
+rebuild:
+	docker-compose down --remove-orphans --volumes && docker-compose up --build
+
+# 📋 Show running containers in this Compose project
+ps:
+	docker-compose ps
