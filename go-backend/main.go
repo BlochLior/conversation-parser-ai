@@ -7,6 +7,7 @@ import (
 
 	"github.com/BlochLior/conversation-parser-ai/go-backend/handlers"
 	"github.com/BlochLior/conversation-parser-ai/go-backend/utils"
+	"github.com/BlochLior/conversation-parser-ai/shared/cors"
 )
 
 func main() {
@@ -19,7 +20,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:         ":8000",
-		Handler:      mux,
+		Handler:      cors.WithCORS(mux),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,

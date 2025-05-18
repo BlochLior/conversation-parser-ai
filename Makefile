@@ -63,7 +63,7 @@ ci-go: lint-go gosec test-go
 # 🚦 Full CI target for both services
 ci-all: ci-python ci-go
 
-# 🧪 Run both Go and Python services via Compose
+# 🧪 Run frontend, backend and ai services via Compose
 dev:
 	docker-compose up --build
 

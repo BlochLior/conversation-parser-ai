@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conversation Analyzer</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 700px; margin: auto; }
+    textarea { width: 100%; height: 150px; font-size: 1rem; margin-bottom: 1rem; }
+    button { padding: 0.5rem 1rem; font-size: 1rem; }
+    .result { margin-top: 1.5rem; padding: 1rem; background: #f3f3f3; border-radius: 6px; }
+    pre { white-space: pre-wrap; word-wrap: break-word; }
+  </style>
+</head>
+<body>
+  <h1>🧠 Conversation Analyzer</h1>
+  <p>Paste a conversation below to identify communication issues and suggestions.</p>
+
+  <textarea id="conversationInput" placeholder="Speaker A: Hello\nSpeaker B: What?"></textarea>
+  <button onclick="submitConversation()">Analyze</button>
+
+  <div class="result" id="result" style="display:none">
+    <h3>Results</h3>
+    <pre id="output"></pre>
+  </div>
+
+  <script>
+    async function submitConversation() {
+      const text = document.getElementById('conversationInput').value;
+      const resEl = document.getElementById('result');
+      const outEl = document.getElementById('output');
+      resEl.style.display = 'none';
+
+      const response = await fetch('http://localhost:8000/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversation: text })
+      });
+
+      if (!response.ok) {
+        outEl.textContent = `Error: ${response.status} ${response.statusText}`;
+      } else {
+        const data = await response.json();
+        outEl.textContent = JSON.stringify(data, null, 2);
+      }
+      resEl.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

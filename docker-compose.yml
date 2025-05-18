@@ -1,5 +1,4 @@
 services:
-  # 🧠 Python AI FastAPI service
   python-ai:
     build:
       context: ./python-ai
@@ -12,7 +11,6 @@ services:
       - ENV=production
     restart: unless-stopped
 
-  # 🌐 Go backend API (uses net/http)
   go-backend:
     build:
       context: ./go-backend
@@ -20,7 +18,22 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - python-ai  # Ensure Python service starts first
+      - python-ai
     environment:
       - PYTHON_AI_URL=http://python-ai:8001
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - go-backend
     restart: unless-stopped
