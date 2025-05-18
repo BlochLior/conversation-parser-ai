@@ -1,7 +1,7 @@
 # Project-root Makefile - Python & Go services
 
 # Prevent caching issues and ensure all targets run fresh every time
-.PHONY: health lint-python format-python test-python build-python run-docker-python ci-python test-go logs
+.PHONY: health lint-python format-python test-python build-python run-docker-python build-go run-docker-go ci-python test-go logs gosec lint-go ci-go ci-all
 
 # ✅ Ping /health endpoint to confirm service is running
 health:
@@ -27,6 +27,14 @@ build-python:
 run-docker-python:
 	docker run -p 8001:8001 --env-file=./python-ai/.env -e ENV=production python-ai-service
 
+# 🐳 Build Docker image for Go backend
+build-go:
+	docker build -t go-backend-service ./go-backend
+
+# 🐳 Run Go backend in Docker
+run-docker-go:
+	docker run -p 8000:8000 go-backend-service
+
 # 📄 View recent logs from the Python AI service container
 logs:
 	docker ps -q --filter ancestor=python-ai-service | xargs -r docker logs --tail=50
@@ -36,4 +44,19 @@ ci-python: lint-python test-python health
 
 # Run go tests
 test-go:
-	go test ./go-backend/...
+	cd go-backend && go test ./...
+
+# Go security check
+gosec:
+	cd go-backend && gosec ./...
+
+# Go lint check
+lint-go:
+	cd go-backend && golangci-lint run ./...
+
+# 🚦 Go CI target for lint + security
+ci-go: lint-go gosec test-go
+
+# 🚦 Full CI target for both services
+ci-all: ci-python ci-go
+

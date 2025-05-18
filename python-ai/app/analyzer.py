@@ -1,10 +1,7 @@
 import os
 import json
-from typing import List
 from app.schema import AnalyzeResponse
 from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_openai import ChatOpenAI
 from fastapi import HTTPException
 from pathlib import Path
 import logging
@@ -35,16 +32,20 @@ def safe_parse_json(response_text: str) -> dict:
         return json.loads(response_text)
     except json.JSONDecodeError as e:
         logger.error(f"❌ Failed to parse JSON: {e}\nResponse text: {response_text}")
-        raise HTTPException(status_code=500, detail="Invalid JSON format returned by AI")
+        raise HTTPException(status_code=500, detail="AI analysis failed: invalid JSON format")
 
 async def analyze_conversation(text: str, chain) -> AnalyzeResponse:
     try:
         result = await chain.ainvoke({"conversation": text})
+        logger.debug(f"🔎 Raw AI result: {result}")
         parsed = safe_parse_json(result)
         return AnalyzeResponse(
             issues=parsed.get("issues", []),
             suggestions=parsed.get("suggestions", [])
         )
+    except HTTPException as http_exc:
+        logger.exception(f"❌ AI analysis failed: {http_exc}")
+        raise
     except Exception as e:
-        logger.exception((f"❌ AI analysis failed: {e}"))
+        logger.exception(f"❌ Unexpected failure: {e}")
         raise HTTPException(status_code=500, detail="AI analysis failed")

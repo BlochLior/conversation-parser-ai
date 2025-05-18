@@ -1,9 +1,8 @@
-# tests/test_analyzer.py
 import unittest
 from unittest.mock import AsyncMock
 
 from app.analyzer import analyze_conversation
-from app.main import AnalyzeResponse
+from app.schema import AnalyzeResponse
 
 class TestAnalyzeConversation(unittest.IsolatedAsyncioTestCase):
     async def test_analyze_conversation(self):
@@ -24,7 +23,7 @@ class TestAnalyzeConversation(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(HTTPException) as context:
             await analyze_conversation("Speaker A: Hello\nSpeaker B: ???", mock_chain)
         self.assertEqual(context.exception.status_code, 500)
-        self.assertIn("Invalid JSON format", context.exception.detail)
+        self.assertIn("AI analysis failed", context.exception.detail)
 
 if __name__ == "__main__":
     unittest.main()

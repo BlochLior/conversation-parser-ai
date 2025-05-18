@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  go-backend:
+    build:
+      context: ./go-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - python-ai
+    environment:
+      - PORT=8000
+    env_file:
+      - ../.env
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  python-ai:
+    build:
+      context: ./python-ai
+    ports:
+      - "8001:8001"
+    env_file:
+      - ../.env
+    environment:
+      - PORT=8001

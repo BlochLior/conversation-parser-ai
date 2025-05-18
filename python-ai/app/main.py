@@ -1,5 +1,7 @@
+from langchain_openai.chat_models.base import ChatOpenAI
+from langchain_core.output_parsers.string import StrOutputParser
 from fastapi import FastAPI
-from app.analyzer import analyze_conversation, ChatOpenAI, prompt, StrOutputParser, model_name
+from app.analyzer import analyze_conversation, prompt, model_name
 from app.schema import AnalyzeRequest, AnalyzeResponse
 import logging
 import os

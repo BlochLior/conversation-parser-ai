@@ -2,3 +2,5 @@ plan.md
 .env
 __pycache__/
 .vscode/
+.ruff_cache/
+default.code-workspace

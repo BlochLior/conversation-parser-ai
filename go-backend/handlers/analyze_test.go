@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,7 +14,9 @@ func TestAnalyzeHandler_Success(t *testing.T) {
 	mockAI := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"issues": ["tone mismatch"], "suggestions": ["clarify intent"]}`))
+		if _, err := w.Write([]byte(`{"issues": ["tone mismatch"], "suggestions": ["clarify intent"]}`)); err != nil {
+			log.Printf("error writing response: %v", err)
+		}
 	}))
 	defer mockAI.Close()
 
