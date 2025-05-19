@@ -1,0 +1,9 @@
+*.log
+*.tmp
+*.out
+*.exe
+*.test
+bin/
+node_modules/
+coverage/
+static/*.map

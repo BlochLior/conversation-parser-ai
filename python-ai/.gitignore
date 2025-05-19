@@ -1,7 +1,10 @@
-# ignore the logs, runtime output
-logs/
-.venv/
+.env
 __pycache__/
-app/__pycache__/
-tests/__pycache__/
+*.pyc
+*.log
+*.egg-info/
+.venv/
+.python-version
+.cache/
+coverage/
 .ruff_cache/

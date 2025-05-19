@@ -1,16 +1,27 @@
-# .dockerignore
+# VCS and editor
 .git
 .gitignore
-**/__pycache__/
+.DS_Store
+.envrc
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.egg-info/
+.python-version
+venv/
+
+# Env and logs
 *.log
 *.env
-*.md
-tests/
-venv/
-.python-version
-*.egg-info/
-__pycache__/
-.envrc
-.DS_Store
-*.pyc
 *.swp
+
+# Build/test artifacts
+tests/
+coverage/
+bin/
+*.out
+*.exe
+
+# Markdown/docs
+*.md

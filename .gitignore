@@ -1,8 +1,28 @@
-plan.md
 .env
+*.log
+*.swp
+*.swo
+*.tmp
+*.bak
+.DS_Store
+*.pyc
 __pycache__/
-.vscode/
+coverage/
+logs/
+venv/
+.python-version
+*.egg-info/
 .ruff_cache/
-default.code-workspace
-test_analyze.sh
-test_goanalyze.sh
+
+# Ignore Docker output
+*.tar
+
+# Ignore test and build artifacts
+/dist
+/build
+/bin
+*.out
+*.exe
+
+# Node/npm fallback if frontend expands
+node_modules/
