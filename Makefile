@@ -1,80 +1,118 @@
-# Project-root Makefile - Python & Go services
+# Root Makefile — unified build, lint, test, CI for Python & Go services
 
-# Prevent caching issues and ensure all targets run fresh every time
-.PHONY: health lint-python format-python test-python build-python run-docker-python build-go run-docker-go ci-python test-go logs gosec lint-go ci-go ci-all
+.PHONY: help build rebuild dev dev-down logs ps \
+        test-python ci-python lint-python format-python \
+        test-go ci-go lint-go gosec \
+        build-python build-go run-docker-python run-docker-go \
+        build-all ci-all health-all health-python health-go health-frontend
 
-# ✅ Ping /health endpoint to confirm service is running
-health:
-	./python-ai/health_check.sh
+## 🔎 Help
+help:
+	@echo "\n📌 Makefile Targets"
+	@echo "\n🚀 Local Dev"
+	@echo "  make build             Build Go & Python services"
+	@echo "  make rebuild           Rebuild everything via Docker Compose"
+	@echo "  make dev               Run all services via Compose"
+	@echo "  make dev-down          Stop and cleanup Compose"
+	@echo "  make logs              Tail logs from Python container"
+	@echo "  make ps                Show Compose container status"
+	@echo "\n🧪 Python"
+	@echo "  make lint-python       Ruff check"
+	@echo "  make format-python     Ruff autofix"
+	@echo "  make test-python       Run unittests"
+	@echo "  make ci-python         Lint + test + health"
+	@echo "\n🧪 Go"
+	@echo "  make lint-go           GolangCI lint"
+	@echo "  make test-go           Run Go tests"
+	@echo "  make gosec             Run gosec security check"
+	@echo "  make ci-go             Lint + test + security"
+	@echo "\n✅ Health"
+	@echo "  make health-all        Check all services"
+	@echo "\n🐳 Docker"
+	@echo "  make build-python      Build Python Docker image"
+	@echo "  make build-go          Build Go Docker image"
+	@echo "  make run-docker-python Run Python container manually"
+	@echo "  make run-docker-go     Run Go container manually"
+	@echo "\n🧪 CI"
+	@echo "  make ci-all            Run all CI targets"
 
-# 🧼 Lint Python code using ruff (report only)
-lint-python:
-	ruff check python-ai
+## 🚀 Local Dev
 
-# 🛠 Auto-fix style issues using ruff (safe fixes only)
-format-python:
-	ruff check --fix python-ai
-
-# 🧪 Run Python unittests
-test-python:
-	PYTHONPATH=python-ai python3 -m unittest discover -s python-ai/tests -p "test_*.py"
-
-# 🐳 Build Docker image for Python AI service
-build-python:
-	docker build -t python-ai-service ./python-ai
-
-# 🐳 Run Python AI service in Docker
-run-docker-python:
-	docker run -p 8001:8001 --env-file=./python-ai/.env -e ENV=production python-ai-service
-
-# 🐳 Build Docker image for Go backend
-build-go:
-	docker build -t go-backend-service ./go-backend
-
-# 🐳 Run Go backend in Docker
-run-docker-go:
-	docker run -p 8000:8000 go-backend-service
-
-# 🔁 Build both services
-build-all: build-python build-go
-
-# 📄 View recent logs from the Python AI service container
-logs:
-	docker ps -q --filter ancestor=python-ai-service | xargs -r docker logs --tail=50
-
-# ✅ CI target — run lint, test, and health checks in sequence
-ci-python: lint-python test-python health
-
-# Run go tests
-test-go:
-	cd go-backend && go test ./...
-
-# Go security check
-gosec:
-	cd go-backend && gosec ./...
-
-# Go lint check
-lint-go:
-	cd go-backend && golangci-lint run ./...
-
-# 🚦 Go CI target for lint + security
-ci-go: lint-go gosec test-go
-
-# 🚦 Full CI target for both services
-ci-all: ci-python ci-go
-
-# 🧪 Run frontend, backend and ai services via Compose
-dev:
-	docker-compose up --build
-
-# 🛑 Stop and clean up all Compose containers
-dev-down:
-	docker-compose down --remove-orphans --volumes
-
-# 🔁 Rebuild and restart services with Docker Compose
+build: build-python build-go
 rebuild:
 	docker-compose down --remove-orphans --volumes && docker-compose up --build
 
-# 📋 Show running containers in this Compose project
+dev:
+	docker-compose up --build
+
+dev-down:
+	docker-compose down --remove-orphans --volumes
+
+logs:
+	docker ps -q --filter ancestor=python-ai-service | xargs -r docker logs --tail=50
+
 ps:
 	docker-compose ps
+
+## 🧪 Python: Lint, Test, CI
+
+lint-python:
+	ruff check python-ai
+
+format-python:
+	ruff check --fix python-ai
+
+test-python:
+	PYTHONPATH=python-ai python3 -m unittest discover -s python-ai/tests -p "test_*.py"
+
+ci-python: lint-python test-python health-python
+
+## ✅ Python healthcheck
+
+health-python:
+	./python-ai/health_check.sh
+
+## 🧪 Go: Lint, Test, CI
+
+lint-go:
+	cd go-backend && golangci-lint run ./...
+
+test-go:
+	cd go-backend && go test ./...
+
+gosec:
+	cd go-backend && gosec ./...
+
+ci-go: lint-go gosec test-go
+
+## ✅ Go healthcheck
+
+health-go:
+	curl -sf http://localhost:8000/health || (echo "❌ go-backend /health failed" && exit 1)
+
+## ✅ Frontend healthcheck
+
+health-frontend:
+	curl -sf http://localhost:8080/health || (echo "❌ frontend /health failed" && exit 1)
+
+## ✅ Check all /health endpoints
+
+health-all: health-python health-go health-frontend
+
+## 🐳 Build individual images
+
+build-python:
+	docker build -t python-ai-service ./python-ai
+
+build-go:
+	docker build -t go-backend-service ./go-backend
+
+run-docker-python:
+	docker run -p 8001:8001 --env-file=./python-ai/.env -e ENV=production python-ai-service
+
+run-docker-go:
+	docker run -p 8000:8000 go-backend-service
+
+## 🔁 Aggregate CI
+
+ci-all: ci-python ci-go
