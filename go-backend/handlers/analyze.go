@@ -2,16 +2,25 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/BlochLior/conversation-parser-ai/go-backend/client"
 	"github.com/BlochLior/conversation-parser-ai/go-backend/internal"
 	"github.com/BlochLior/conversation-parser-ai/go-backend/utils"
 )
 
-var aiService = client.New("http://localhost:8001")
+var aiService = client.New(getAIURL())
 
-// var pythonAIURL = "http://localhost:8001/analyze"
+func getAIURL() string {
+	url := os.Getenv("PYTHON_AI_URL")
+	if url == "" {
+		log.Println("⚠️ PYTHON_AI_URL not set, defaulting to http://python-ai:8001")
+		url = "http://python-ai:8001"
+	}
+	return url
+}
 
 func AnalyzeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {

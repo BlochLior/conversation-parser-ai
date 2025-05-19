@@ -13,8 +13,11 @@ services:
 
   go-backend:
     build:
-      context: ./go-backend
+      context: .
+      dockerfile: go-backend/Dockerfile
     container_name: go-backend
+    env_file:
+      - ./go-backend/.env
     ports:
       - "8000:8000"
     depends_on:
@@ -30,10 +33,16 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: frontend
     ports:
       - "8080:8080"
     depends_on:
       - go-backend
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

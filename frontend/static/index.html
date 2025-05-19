@@ -9,7 +9,9 @@
     textarea { width: 100%; height: 150px; font-size: 1rem; margin-bottom: 1rem; }
     button { padding: 0.5rem 1rem; font-size: 1rem; }
     .result { margin-top: 1.5rem; padding: 1rem; background: #f3f3f3; border-radius: 6px; }
-    pre { white-space: pre-wrap; word-wrap: break-word; }
+    ul { margin: 0.5rem 0 1rem 1.2rem; }
+    h4 { margin-bottom: 0.3rem; }
+    .status { margin-top: 1rem; font-style: italic; color: #444; }
   </style>
 </head>
 <body>
@@ -19,9 +21,9 @@
   <textarea id="conversationInput" placeholder="Speaker A: Hello\nSpeaker B: What?"></textarea>
   <button onclick="submitConversation()">Analyze</button>
 
+  <div class="status" id="status"></div>
   <div class="result" id="result" style="display:none">
-    <h3>Results</h3>
-    <pre id="output"></pre>
+    <div id="output"></div>
   </div>
 
   <script>
@@ -29,21 +31,40 @@
       const text = document.getElementById('conversationInput').value;
       const resEl = document.getElementById('result');
       const outEl = document.getElementById('output');
+      const statusEl = document.getElementById('status');
+
       resEl.style.display = 'none';
+      statusEl.textContent = '⏳ Please wait, AI is processing input...';
+      outEl.innerHTML = '';
 
-      const response = await fetch('http://localhost:8000/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversation: text })
-      });
+      try {
+        const response = await fetch('http://localhost:8000/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ conversation: text })
+        });
 
-      if (!response.ok) {
-        outEl.textContent = `Error: ${response.status} ${response.statusText}`;
-      } else {
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
         const data = await response.json();
-        outEl.textContent = JSON.stringify(data, null, 2);
+        renderResult(data);
+        resEl.style.display = 'block';
+        statusEl.textContent = '✅ AI success! The following are some possible issues and suggestions it had spotted:';
+      } catch (err) {
+        statusEl.textContent = '❌ Failed to fetch AI analysis: ' + err.message;
       }
-      resEl.style.display = 'block';
+    }
+
+    function renderResult(data) {
+      const output = document.getElementById("output");
+      output.innerHTML = `
+        <h4>Issues</h4>
+        <ul>${(data.issues || []).map(issue => `<li>${issue}</li>`).join('')}</ul>
+        <h4>Suggestions</h4>
+        <ul>${(data.suggestions || []).map(s => `<li>${s}</li>`).join('')}</ul>
+      `;
     }
   </script>
 </body>

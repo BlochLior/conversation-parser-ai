@@ -8,10 +8,17 @@ import (
 	"github.com/BlochLior/conversation-parser-ai/shared/cors"
 )
 
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	if _, err := w.Write([]byte("ok")); err != nil {
+		log.Printf("error writing response: %v", err)
+	}
+}
+
 func main() {
-	fs := http.FileServer(http.Dir("./static"))
 	mux := http.NewServeMux()
-	mux.Handle("/", fs)
+	mux.HandleFunc("/health", healthHandler)
+	mux.Handle("/", http.FileServer(http.Dir("./static")))
 
 	srv := &http.Server{
 		Addr:         ":8080",

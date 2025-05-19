@@ -1,0 +1,16 @@
+# .dockerignore
+.git
+.gitignore
+**/__pycache__/
+*.log
+*.env
+*.md
+tests/
+venv/
+.python-version
+*.egg-info/
+__pycache__/
+.envrc
+.DS_Store
+*.pyc
+*.swp

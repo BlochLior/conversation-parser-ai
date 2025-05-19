@@ -4,3 +4,5 @@ __pycache__/
 .vscode/
 .ruff_cache/
 default.code-workspace
+test_analyze.sh
+test_goanalyze.sh
